@@ -288,6 +288,16 @@ func (r *Raft) sendHeartbeatResponse(to uint64, reject bool, index uint64) {
 	r.msgs = append(r.msgs, msg)
 }
 
+func (r *Raft) sendTimeoutNow(to uint64) {
+	// maybe in 3A
+	msg := pb.Message{
+		MsgType: pb.MessageType_MsgTimeoutNow,
+		From:    r.id,
+		To:      to,
+	}
+	r.msgs = append(r.msgs, msg)
+}
+
 
 
 func (r *Raft) sendRequestVoteResponse(to uint64, reject bool) {
@@ -434,6 +444,11 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleHeartbeat(m)
 		case pb.MessageType_MsgTimeoutNow:
 			r.electionElapsed = r.electionTimeout//?
+		case pb.MessageType_MsgTransferLeader:
+			if r.Lead != None{
+				m.To = r.Lead
+				r.msgs = append(r.msgs, m)
+			}
 		}
 	case StateCandidate:
 		switch m.MsgType{
@@ -447,6 +462,11 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleAppendEntries(m)
 		case pb.MessageType_MsgHeartbeat:
 			r.handleHeartbeat(m)
+		case pb.MessageType_MsgTransferLeader:
+			if r.Lead != None{
+				m.To = r.Lead
+				r.msgs = append(r.msgs, m)
+			}
 		}
 	case StateLeader:
 		switch m.MsgType{
@@ -466,6 +486,8 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleAppendResponse(m)
 		case pb.MessageType_MsgPropose:
 			r.appendEntry(m)
+		case pb.MessageType_MsgTransferLeader:
+			r.handleTransferLeader(m)
 		}
 	}
 	return nil
@@ -728,6 +750,27 @@ func (r *Raft) appendEntry(m pb.Message) {
 	}
 
 }
+
+func (r *Raft) handleTransferLeader(m pb.Message) {
+	//???
+	if m.From == r.id {
+		return
+	}
+	if r.leadTransferee != None && r.leadTransferee == m.From {
+		return
+	}
+	/*if _, ok := r.Prs[m.From]; !ok {
+		return
+	}*/
+	r.leadTransferee = m.From
+	//r.transferElapsed = 0
+	if r.Prs[m.From].Match == r.RaftLog.LastIndex() {
+		r.sendTimeoutNow(m.From)
+	} else {
+		r.sendAppend(m.From)
+	}
+}
+
 // handleSnapshot handle Snapshot RPC request
 func (r *Raft) handleSnapshot(m pb.Message) {
 	// Your Code Here (2C).
