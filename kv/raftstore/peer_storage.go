@@ -56,8 +56,14 @@ type PeerStorage struct {
 
 func (ps *PeerStorage) HeadEntry() eraftpb.Entry {
 	//TO DO: solve the problem about HeadEntry
+	if ps.raftState.LastIndex+1 == ps.truncatedIndex(){
+		return eraftpb.Entry{
+			Index: 0,
+		}
+	}
+
 	low, _ := ps.FirstIndex()
-	entries, _ := ps.Entries(low + 1, low + 1)
+	entries, _ := ps.Entries(low, low)
 	return entries[0]
 }
 
