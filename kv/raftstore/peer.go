@@ -71,6 +71,7 @@ type peer struct {
 	// * split check
 	ticker *ticker
 	// Instance of the Raft module
+	// *****
 	RaftGroup *raft.RawNode
 	// The peer storage for the Raft module
 	peerStorage *PeerStorage

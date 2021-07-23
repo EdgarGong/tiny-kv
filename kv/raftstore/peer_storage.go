@@ -28,7 +28,7 @@ type ApplySnapResult struct {
 	Region     *metapb.Region
 }
 
-var _ raft.Storage = new(PeerStorage) //"PeerStorage" implement the "raft.Storage"interface
+var _ raft.Storage = new(PeerStorage) //"PeerStorage" implement the "raft.Storage" interface
 
 type PeerStorage struct {
 	// current region information of the peer
@@ -55,13 +55,18 @@ type PeerStorage struct {
 }
 
 func (ps *PeerStorage) HeadEntry() eraftpb.Entry {
-	entries, _ := ps.Entries(0, 1)
+	//TO DO: solve the problem about HeadEntry
+	low, _ := ps.FirstIndex()
+	entries, _ := ps.Entries(low + 1, low + 1)
 	return entries[0]
 }
 
 // NewPeerStorage get the persist raftState from engines and return a peer storage
 func NewPeerStorage(engines *engine_util.Engines, region *metapb.Region, regionSched chan<- worker.Task, tag string) (*PeerStorage, error) {
 	log.Debugf("%s creating storage for %s", tag, region.String())
+	// 当创建 PeerStorage 的时候，首先我们会从 RocksDB 里面得到
+	// 该 Peer 之前的 RaftLocalState，RaftApplyState，以及 last_term 等，
+	// 这些会缓存到内存里面，便于后续的快速度访问。
 	raftState, err := meta.InitRaftLocalState(engines.Raft, region)
 	if err != nil {
 		return nil, err
@@ -99,9 +104,10 @@ func (ps *PeerStorage) Entries(low, high uint64) ([]eraftpb.Entry, error) {
 	if err := ps.checkRange(low, high); err != nil || low == high { //if low <= high
 		return nil, err
 	}
+	// the buf of the entries
 	buf := make([]eraftpb.Entry, 0, high-low)
 	nextIndex := low
-	txn := ps.Engines.Raft.NewTransaction(false)
+	txn := ps.Engines.Raft.NewTransaction(false) // read only
 	defer txn.Discard()
 	startKey := meta.RaftLogKey(ps.region.Id, low)
 	endKey := meta.RaftLogKey(ps.region.Id, high)
@@ -267,6 +273,7 @@ func (ps *PeerStorage) clearMeta(kvWB, raftWB *engine_util.WriteBatch) error {
 }
 
 // Delete all data that is not covered by `new_region`.
+// may for the Conf_Change in 3B
 func (ps *PeerStorage) clearExtraData(newRegion *metapb.Region) {
 	oldStartKey, oldEndKey := ps.region.GetStartKey(), ps.region.GetEndKey()
 	newStartKey, newEndKey := newRegion.GetStartKey(), newRegion.GetEndKey()
@@ -326,10 +333,21 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 	/*if len(entries) == 0 {
 		return nil
 	}*/
+	// previous last index
 	pli := ps.raftState.LastIndex
+	// last entry
 	le := entries[len(entries) - 1]
+	// last index
 	li := le.Index
-	lt := le.Term
+	// first index
+	fi, _ := ps.FirstIndex()
+
+	if li < fi {
+		return nil
+	}
+	if fi > entries[0].Index {
+		entries = entries[fi-entries[0].Index:]
+	}
 	//simply save all log entries at raft.Ready.Entries to raftdb
 	for _, entry := range entries{
 		err := raftWB.SetMeta(meta.RaftLogKey(ps.region.Id, entry.Index), &entry)
@@ -337,12 +355,16 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 			return err
 		}
 	}
-	//delete any previously appended log entries which will never be committed.
-	for i := pli; i < li; i++{
-		raftWB.DeleteMeta(meta.RaftLogKey(ps.region.Id, i))
+	// delete any previously appended log entries which will never be committed.
+	// range from last index to previous last index
+	if pli > li {
+		for i := li + 1; i <= pli; i++ {
+			raftWB.DeleteMeta(meta.RaftLogKey(ps.region.Id, i))
+		}
 	}
+	//update the peer storage’s RaftLocalState
 	ps.raftState.LastIndex = li
-	ps.raftState.LastTerm = lt
+	ps.raftState.LastTerm = le.Term
 	return nil
 }
 
@@ -387,12 +409,12 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	if err := ps.Append(ready.Entries, raftWB); err != nil{
 		return nil, err
 	}
-	// Also, update the peer storage’s RaftLocalState
+	// update peer storage’s RaftLocalState.HardState
 	if !raft.IsEmptyHardState(ready.HardState) {
 		ps.raftState.HardState = &ready.HardState
 	}
 	// and save it to raftdb.
-	raftWB.SetMeta(meta.RaftStateKey(ps.region.Id), &ready.HardState)
+	raftWB.SetMeta(meta.RaftStateKey(ps.region.Id), ps.raftState)
 	raftWB.MustWriteToDB(ps.Engines.Raft)
 	return nil, nil
 }

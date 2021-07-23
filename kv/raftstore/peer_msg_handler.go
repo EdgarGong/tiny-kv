@@ -66,7 +66,9 @@ func (d *peerMsgHandler) HandleMsg(msg message.Msg) {
 		if err := d.onRaftMsg(raftMsg); err != nil {
 			log.Errorf("%s handle raft message error %v", d.Tag, err)
 		}
-	// wraps the request from clients
+	// MsgTypeRaftCmd warps a raft command that maybe a read/write request
+	// or admin request(such as transfer leader and change peer).
+	// The raft command should be proposed to Raft module.
 	case message.MsgTypeRaftCmd:
 		raftCMD := msg.Data.(*message.MsgRaftCmd)
 		d.proposeRaftCommand(raftCMD.Request, raftCMD.Callback)

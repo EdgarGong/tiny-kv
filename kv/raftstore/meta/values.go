@@ -39,11 +39,12 @@ func GetRaftEntry(db *badger.DB, regionId, idx uint64) (*eraftpb.Entry, error) {
 	}
 	return entry, nil
 }
-
+// When we create a region peer, we should initialize its log term/index > 0,
+// so that we can force the follower peer to sync the snapshot first.
 const (
-	// When we create a region peer, we should initialize its log term/index > 0,
-	// so that we can force the follower peer to sync the snapshot first.
+	// RaftInitLogTerm : RAFT_INIT_LOG_TERM
 	RaftInitLogTerm  = 5
+	// RaftInitLogIndex : RAFT_INIT_LOG_INDEX
 	RaftInitLogIndex = 5
 )
 

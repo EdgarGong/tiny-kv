@@ -233,7 +233,16 @@ type Region struct {
 	// Region key range [start_key, end_key).
 	StartKey             []byte       `protobuf:"bytes,2,opt,name=start_key,json=startKey,proto3" json:"start_key,omitempty"`
 	EndKey               []byte       `protobuf:"bytes,3,opt,name=end_key,json=endKey,proto3" json:"end_key,omitempty"`
+	// 当一个 Region 添加或者删除 Peer，或者 split 等，
+	// 我们就会认为这个 Region 的 epoch 发生的变化，
+	//RegionEpoch 的 conf_ver 会在每次做 ConfChange 的时候递增，
+	//而 version 则是会在每次做 split/merge 的时候递增
 	RegionEpoch          *RegionEpoch `protobuf:"bytes,4,opt,name=region_epoch,json=regionEpoch" json:"region_epoch,omitempty"`
+	// peers：当前 Region 包含的节点信息。
+	// 对于一个 Raft Group，我们通常有三个副本，
+	// 每个副本我们使用 Peer 来表示，
+	// Peer 的 id 也是全局由 PD 分配，
+	// 而 store_id 则表明这个 Peer 在哪一个 Store 上面
 	Peers                []*Peer      `protobuf:"bytes,5,rep,name=peers" json:"peers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`

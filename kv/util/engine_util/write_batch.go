@@ -36,7 +36,7 @@ func (wb *WriteBatch) SetCF(cf string, key, val []byte) {
 	wb.size += len(key) + len(val)
 }
 
-func (wb *WriteBatch) DeleteMeta(key []byte) {
+func (wb *WriteBatch) DeleteMeta(key []byte) { // append key without value
 	wb.entries = append(wb.entries, &badger.Entry{
 		Key: key,
 	})
@@ -50,6 +50,7 @@ func (wb *WriteBatch) DeleteCF(cf string, key []byte) {
 	wb.size += len(key)
 }
 
+// SetMeta : append key-value pair to the WriteBatch
 func (wb *WriteBatch) SetMeta(key []byte, msg proto.Message) error {
 	val, err := proto.Marshal(msg)
 	if err != nil {

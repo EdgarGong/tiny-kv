@@ -201,7 +201,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 	ch_partitioner := make(chan bool)
 	ch_confchange := make(chan bool)
 	ch_clients := make(chan bool)
-	clnts := make([]chan int, nclients)
+	clnts := make([]chan int, nclients) // clients
 	for i := 0; i < nclients; i++ {
 		clnts[i] = make(chan int, 1)
 	}
@@ -216,14 +216,14 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 			}()
 			last := ""
 			for atomic.LoadInt32(&done_clients) == 0 {
-				if (rand.Int() % 1000) < 500 {
+				if (rand.Int() % 1000) < 500 { //put the value
 					key := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", j)
 					value := "x " + strconv.Itoa(cli) + " " + strconv.Itoa(j) + " y"
 					// log.Infof("%d: client new put %v,%v\n", cli, key, value)
 					cluster.MustPut([]byte(key), []byte(value))
 					last = NextValue(last, value)
 					j++
-				} else {
+				} else { //check the value from 0 to j
 					start := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", 0)
 					end := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", j)
 					// log.Infof("%d: client new scan %v-%v\n", cli, start, end)

@@ -11,7 +11,7 @@ type raftWorker struct {
 	pr *router
 
 	// receiver of messages should sent to raft, including:
-	// * raft command from `raftStorage`
+	// * raft command from `raftStorage`(in raft_server.go)
 	// * raft inner messages from other peers sent by network
 	raftCh chan message.Msg
 	ctx    *GlobalContext
@@ -39,6 +39,7 @@ func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 		case <-closeCh:
 			return
 		case msg := <-rw.raftCh:
+			// polls raftCh to get the messages
 			msgs = append(msgs, msg)
 		}
 		pending := len(rw.raftCh)
