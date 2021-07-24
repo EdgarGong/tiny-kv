@@ -55,7 +55,7 @@ type Storage interface {
 	// raft log position i+snapshot.Metadata.Index
 
 	//??????????
-	HeadEntry() pb.Entry
+	//HeadEntry() pb.Entry
 
 	// Term returns the term of entry i, which must be in the range
 	// [FirstIndex()-1, LastIndex()]. The term of the entry before
@@ -111,12 +111,12 @@ func (ms *MemoryStorage) SetHardState(st pb.HardState) error {
 	ms.hardState = st
 	return nil
 }
-
+/*
 func (ms *MemoryStorage) HeadEntry() pb.Entry {
 	ms.Lock()
 	defer ms.Unlock()
 	return ms.ents[0]
-}
+}*/
 
 // Entries implements the Storage interface.
 func (ms *MemoryStorage) Entries(lo, hi uint64) ([]pb.Entry, error) {

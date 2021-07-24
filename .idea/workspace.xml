@@ -3,7 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="e95a819b-51ae-420a-bf78-f92a05d19700" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/raftstore/raft_worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/raft_worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/test_raftstore/cluster.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/test_raftstore/cluster.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raft/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/log.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raft/raft.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/raft.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raft/rawnode.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/rawnode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raft/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/storage.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,14 +46,14 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
+    <property name="settings.editor.selected.configurable" value="go" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestBasic2B">
     <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestBasic2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
@@ -58,9 +66,34 @@
       <pattern value="^\QTestBasic2B\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestConcurrent2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="tiny-kv" />
+      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestConcurrent2B\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="tiny-kv" />
+      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <package value="github.com/pingcap-incubator/tinykv" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/kv/test_raftstore/test_test.go" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestBasic2B" />
+        <item itemvalue="Go 测试.test_test.go" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestConcurrent2B" />
       </list>
     </recent_temporary>
   </component>
@@ -75,20 +108,11 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/raft/log.go</url>
-          <line>96</line>
-          <option name="timeStamp" value="44" />
+          <url>file://$PROJECT_DIR$/kv/test_raftstore/test_test.go</url>
+          <line>208</line>
+          <option name="timeStamp" value="122" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="GoTestRunConfiguration">
-        <watch expression="ps.raftState.LastIndex" />
-        <watch expression="ps.truncatedIndex()" />
-        <watch expression="l.indexEntries(l.applied)+1" />
-        <watch expression="l.indexEntries(l.committed)+1" />
-        <watch expression="l" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

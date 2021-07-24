@@ -193,6 +193,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 
 	electionTimeout := cfg.RaftBaseTickInterval * time.Duration(cfg.RaftElectionTimeoutTicks)
 	// Wait for leader election
+	time.Now()
 	time.Sleep(2 * electionTimeout)
 
 	done_partitioner := int32(0)
@@ -219,7 +220,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 				if (rand.Int() % 1000) < 500 { //put the value
 					key := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", j)
 					value := "x " + strconv.Itoa(cli) + " " + strconv.Itoa(j) + " y"
-					// log.Infof("%d: client new put %v,%v\n", cli, key, value)
+					 log.Infof("%d: client new put %v,%v\n", cli, key, value)
 					cluster.MustPut([]byte(key), []byte(value))
 					last = NextValue(last, value)
 					j++

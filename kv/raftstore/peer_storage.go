@@ -54,7 +54,7 @@ type PeerStorage struct {
 	Tag string
 }
 
-func (ps *PeerStorage) HeadEntry() eraftpb.Entry {
+/*func (ps *PeerStorage) HeadEntry() eraftpb.Entry {
 	//TO DO: solve the problem about HeadEntry
 	if ps.raftState.LastIndex+1 == ps.truncatedIndex(){
 		return eraftpb.Entry{
@@ -65,7 +65,7 @@ func (ps *PeerStorage) HeadEntry() eraftpb.Entry {
 	low, _ := ps.FirstIndex()
 	entries, _ := ps.Entries(low, low)
 	return entries[0]
-}
+}*/
 
 // NewPeerStorage get the persist raftState from engines and return a peer storage
 func NewPeerStorage(engines *engine_util.Engines, region *metapb.Region, regionSched chan<- worker.Task, tag string) (*PeerStorage, error) {

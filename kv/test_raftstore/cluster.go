@@ -3,7 +3,6 @@ package test_raftstore
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -55,6 +54,7 @@ func (c *Cluster) Start() {
 	ctx := context.TODO()
 	clusterID := c.schedulerClient.GetClusterID(ctx)
 
+	//creat stores
 	for storeID := uint64(1); storeID <= uint64(c.count); storeID++ {
 		dbPath, err := ioutil.TempDir("", "test-raftstore")
 		if err != nil {
@@ -97,6 +97,7 @@ func (c *Cluster) Start() {
 		RegionEpoch: regionEpoch,
 	}
 
+	//creat peer for each store
 	for storeID, engine := range c.engines {
 		peer := NewPeer(storeID, storeID)
 		firstRegion.Peers = append(firstRegion.Peers, peer)
@@ -106,6 +107,7 @@ func (c *Cluster) Start() {
 		}
 	}
 
+	// write the region into the engine
 	for _, engine := range c.engines {
 		raftstore.PrepareBootstrapCluster(engine, firstRegion)
 	}
@@ -114,6 +116,7 @@ func (c *Cluster) Start() {
 		Id:      1,
 		Address: "",
 	}
+	//response
 	resp, err := c.schedulerClient.Bootstrap(context.TODO(), store)
 	if err != nil {
 		panic(err)
@@ -272,7 +275,7 @@ func (c *Cluster) GetRegion(key []byte) *metapb.Region {
 		// retry to get the region again.
 		SleepMS(20)
 	}
-	panic(fmt.Sprintf("find no region for %s", hex.EncodeToString(key)))
+	panic(fmt.Sprintf("find no region for %s", key))
 }
 
 func (c *Cluster) GetRandomRegion() *metapb.Region {

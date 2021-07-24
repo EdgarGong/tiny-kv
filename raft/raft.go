@@ -771,6 +771,14 @@ func (r *Raft) handleTransferLeader(m pb.Message) {
 	}
 }
 
+func (r *Raft) hardState() pb.HardState {
+	return pb.HardState{
+		Term:   r.Term,
+		Vote:   r.Vote,
+		Commit: r.RaftLog.committed,
+	}
+}
+
 // handleSnapshot handle Snapshot RPC request
 func (r *Raft) handleSnapshot(m pb.Message) {
 	// Your Code Here (2C).
