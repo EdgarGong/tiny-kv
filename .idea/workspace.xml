@@ -3,14 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e95a819b-51ae-420a-bf78-f92a05d19700" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kv/raftstore/raft_worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/raft_worker.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raft/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raft/raft.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/raft.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raft/rawnode.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/rawnode.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
