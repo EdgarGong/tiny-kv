@@ -336,9 +336,9 @@ func ClearMeta(engines *engine_util.Engines, kvWB, raftWB *engine_util.WriteBatc
 // Also, update the peer storage’s RaftLocalState and save it to raftdb.
 func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.WriteBatch) error {
 	// Your Code Here (2B).
-	/*if len(entries) == 0 {
+	if len(entries) == 0 {
 		return nil
-	}*/
+	}
 	// previous last index
 	pli := ps.raftState.LastIndex
 	// last entry
@@ -410,6 +410,13 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	// Your Code Here (2B/2C).
 	// 2C is to be done later
 	raftWB := new(engine_util.WriteBatch)
+	var result *ApplySnapResult
+	var err error
+	if !raft.IsEmptySnap(&ready.Snapshot) {
+		kvWB := new(engine_util.WriteBatch)
+		result, err = ps.ApplySnapshot(&ready.Snapshot, kvWB, raftWB)
+		kvWB.WriteToDB(ps.Engines.Kv)
+	}
 	// To append log entries, simply save all log entries at raft.Ready.Entries to raftdb
 	// and delete any previously appended log entries which will never be committed.
 	if err := ps.Append(ready.Entries, raftWB); err != nil{
@@ -422,7 +429,7 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	// and save it to raftdb.
 	raftWB.SetMeta(meta.RaftStateKey(ps.region.Id), ps.raftState)
 	raftWB.MustWriteToDB(ps.Engines.Raft)
-	return nil, nil
+	return result, err
 }
 
 func (ps *PeerStorage) ClearData() {

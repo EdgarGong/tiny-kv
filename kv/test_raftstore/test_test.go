@@ -193,7 +193,6 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 
 	electionTimeout := cfg.RaftBaseTickInterval * time.Duration(cfg.RaftElectionTimeoutTicks)
 	// Wait for leader election
-	time.Now()
 	time.Sleep(2 * electionTimeout)
 
 	done_partitioner := int32(0)

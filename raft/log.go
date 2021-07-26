@@ -61,7 +61,10 @@ func newLog(storage Storage) *RaftLog {
 	hardState, _, _ := storage.InitialState()
 	firstIndex, _ := storage.FirstIndex()
 	lastIndex, _ := storage.LastIndex()
-	entries, _ := storage.Entries(firstIndex, lastIndex + 1)
+	entries, err := storage.Entries(firstIndex, lastIndex + 1)
+	if err != nil {
+		panic(err)
+	}
 	return &RaftLog{
 		storage:         storage,
 		committed:       hardState.GetCommit(),
@@ -72,7 +75,6 @@ func newLog(storage Storage) *RaftLog {
 		//headEntry:       storage.HeadEntry(),
 		FirstIndex: 	 firstIndex,
 	}
-	return nil
 }
 
 // We need to compact the log entries in some point of time like

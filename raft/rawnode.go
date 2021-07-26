@@ -88,7 +88,7 @@ func NewRawNode(config *Config) (*RawNode, error) {
 		RaftState: 	raft.State,
 	}
 	return &RawNode{
-		Raft: newRaft(config),
+		Raft: 		raft,
 		pHardState: pHardState,
 		pSoftState: pSoftState,
 	},
@@ -186,7 +186,8 @@ func (rn *RawNode) Ready() Ready {
 		rn.pHardState = hardState
 	}
 	//?
-	if rn.Raft.RaftLog.pendingSnapshot != nil {
+	rn.Raft.msgs = make([]pb.Message, 0)
+	if !IsEmptySnap(rn.Raft.RaftLog.pendingSnapshot) {
 		ready.Snapshot = *rn.Raft.RaftLog.pendingSnapshot
 		rn.Raft.RaftLog.pendingSnapshot = nil
 	}

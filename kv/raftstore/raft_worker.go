@@ -39,7 +39,6 @@ func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 		case <-closeCh:
 			return
 		case msg := <-rw.raftCh:
-			// polls raftCh to get the messages
 			msgs = append(msgs, msg)
 		}
 		pending := len(rw.raftCh)
@@ -47,14 +46,14 @@ func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 			msgs = append(msgs, <-rw.raftCh)
 		}
 		peerStateMap := make(map[uint64]*peerState)
-		for _, msg := range msgs { //handle messages
+		for _, msg := range msgs {
 			peerState := rw.getPeerState(peerStateMap, msg.RegionID)
 			if peerState == nil {
 				continue
 			}
 			newPeerMsgHandler(peerState.peer, rw.ctx).HandleMsg(msg)
 		}
-		for _, peerState := range peerStateMap { //handle raft ready
+		for _, peerState := range peerStateMap {
 			newPeerMsgHandler(peerState.peer, rw.ctx).HandleRaftReady()
 		}
 		return

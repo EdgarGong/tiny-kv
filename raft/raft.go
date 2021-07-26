@@ -16,7 +16,6 @@ package raft
 
 import (
 	"errors"
-	"fmt"
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 	"math/rand"
 )
@@ -174,10 +173,10 @@ func newRaft(c *Config) *Raft {
 		panic(err.Error())
 	}
 	// Your Code Here (2A).
-	stableState, _, _ := c.Storage.InitialState()
-	 raft := &Raft{
+	stableState, confState, _ := c.Storage.InitialState()
+	raft := &Raft{
 		id:   				c.ID,
-		Term: 				stableState.Term, //???
+		Term: 				stableState.GetTerm(), //???
 		Vote: 				stableState.GetVote(),
 
 		RaftLog:			newLog(c.Storage),
@@ -197,19 +196,25 @@ func newRaft(c *Config) *Raft {
 		PendingConfIndex: 0,
 	}
 	li, _ := c.Storage.LastIndex()
-	for i, peer := range c.peers {
-		fmt.Println(i)
-		if peer == c.ID {
+	if c.peers == nil {
+		c.peers = confState.Nodes
+	}
+	for _, peer := range c.peers {
+		//fmt.Println(i)
+		if peer == raft.id {
 			raft.Prs[peer] = &Progress{
 				Match: li,
 				Next:  li + 1,
 			}
 		} else {
 			raft.Prs[peer] = &Progress{
-				Match: 0,
+				//Match: 0,
 				Next:  li + 1,
 			}
 		}
+	}
+	if c.Applied > 0 {
+		raft.RaftLog.applied = c.Applied
 	}
 	return raft
 }
@@ -219,8 +224,8 @@ func newRaft(c *Config) *Raft {
 func (r *Raft) sendAppend(to uint64) bool {
 	// Your Code Here (2A).
 	//if nextIndex < r.RaftLog.FirstIndex() {
-		//r.sendSnapshot(to)
-		//return false
+	//r.sendSnapshot(to)
+	//return false
 	//}
 	li := r.RaftLog.LastIndex()
 	ni := r.Prs[to].Next
@@ -387,7 +392,7 @@ func (r *Raft) becomeLeader() {
 		Term: r.Term,
 		Index: r.RaftLog.LastIndex() + 1,
 	},
-		)
+	)
 
 	if len(r.Prs) == 1 {
 		r.RaftLog.committed = r.RaftLog.LastIndex()
@@ -528,7 +533,7 @@ func (r *Raft) campaign() {
 func (r *Raft) handleRequestVote(m pb.Message) {
 	// Your Code Here (2A).
 	if r.State != StateFollower && m.Term <= r.Term{
-			r.sendRequestVoteResponse(m.From, true)
+		r.sendRequestVoteResponse(m.From, true)
 	}else{
 		//If leader or candidate receives 'MessageType_MsgRequestVote' with higher term, it will revert
 		//	back to follower
@@ -642,7 +647,7 @@ func (r *Raft) handleAppendEntries(m pb.Message) {
 				r.RaftLog.entries = r.RaftLog.entries[:maxIndex]
 			}
 			//if r.Lead == None{
-				//r.Lead = m.From
+			//r.Lead = m.From
 			//}
 			r.sendAppendResponse(m.From, false, m.Index, len(m.Entries))
 		}
