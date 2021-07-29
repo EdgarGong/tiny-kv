@@ -14,7 +14,9 @@
 
 package raft
 
-import pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
+import (
+	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
+)
 
 // RaftLog manage the log entries, its struct look like:
 //
@@ -91,6 +93,7 @@ func (l *RaftLog) unstableEntries() []pb.Entry {
 		return nil
 	}
 	return l.entries[l.stabled-l.FirstIndex+1:]
+	//return l.entries[l.stabled:]
 	/*
 	if l.stabled >= uint64(len(l.entries)){
 		return make([]pb.Entry, 0)
@@ -103,8 +106,12 @@ func (l *RaftLog) unstableEntries() []pb.Entry {
 func (l *RaftLog) nextEnts() (ents []pb.Entry) {
 	// Your Code Here (2A).
 	if len(l.entries) > 0{
-		 //return l.entries[l.indexEntries(l.applied)+1 : l.indexEntries(l.committed)+1]
+		 //return l.entries[l.indexArray(l.applied)+1 : l.indexArray(l.committed)+1]
+		//if l.applied > l.committed{
+			//panic(ErrUnavailable)
+		//}
 		return l.entries[l.applied-l.FirstIndex+1 : l.committed-l.FirstIndex+1]
+		//return l.entries[l.applied : l.committed]
 	}
 	return nil
 }
@@ -114,7 +121,12 @@ func (l *RaftLog) nextEnts() (ents []pb.Entry) {
 func (l *RaftLog) LastIndex() uint64 {
 	// Your Code Here (2A).
 	//return l.headEntry.Index + uint64(len(l.entries))
-	return uint64(len(l.entries))
+	//return uint64(len(l.entries))
+	if len(l.entries) > 0 {
+		return l.entries[len(l.entries)-1].Index
+	}
+	i, _ := l.storage.LastIndex()
+	return i
 }
 
 // LastTerm :the last entry's term
@@ -135,21 +147,44 @@ func (l *RaftLog) Term(i uint64) (uint64, error) {
 	} else if i == l.headEntry.Index {
 		return l.headEntry.Term, nil
 	}*/
-	if i < 0 {
+	/*if i < 0 {
 		return 0, ErrCompacted
 	} else if i == 0 {
 		return 0, nil
+	}*/
+	if len(l.entries) > 0 && i >= l.FirstIndex {
+		return l.entries[i-l.FirstIndex].Term, nil
+	}else{
+		term, err := l.storage.Term(i)
+		return term, err
 	}
-	index := l.indexEntries(i)
+	/*index := l.indexArray(i)
 	if index >= len(l.entries) {
 		return 0, ErrUnavailable
 	}
-	return l.entries[index].Term, nil
+	return l.entries[index].Term, nil*/
+
+	/*if len(l.entries) > 0 && i >= l.FirstIndex {
+		return l.entries[i-l.FirstIndex].Term, nil
+	}
+	term, err := l.storage.Term(i)
+	return term, err*/
 
 }
 
 // ????
-func (l *RaftLog) indexEntries(i uint64) int {
+/*func (l *RaftLog) indexArray(i uint64) int {
 	//return int(i - l.headEntry.Index - 1)
 	return int(i - 1)
+}*/
+func (l *RaftLog) indexArray(i uint64) int {
+	idx := int(i - l.FirstIndex)
+	if idx < 0 {
+		panic("indexArray: index < 0")
+	}
+	return idx
+}
+
+func (l *RaftLog) indexEntry(i int) uint64 {
+	return uint64(i) + l.FirstIndex
 }

@@ -410,13 +410,13 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	// Your Code Here (2B/2C).
 	// 2C is to be done later
 	raftWB := new(engine_util.WriteBatch)
-	var result *ApplySnapResult
+	/*var result *ApplySnapResult
 	var err error
 	if !raft.IsEmptySnap(&ready.Snapshot) {
 		kvWB := new(engine_util.WriteBatch)
 		result, err = ps.ApplySnapshot(&ready.Snapshot, kvWB, raftWB)
 		kvWB.WriteToDB(ps.Engines.Kv)
-	}
+	}*/
 	// To append log entries, simply save all log entries at raft.Ready.Entries to raftdb
 	// and delete any previously appended log entries which will never be committed.
 	if err := ps.Append(ready.Entries, raftWB); err != nil{
@@ -429,7 +429,8 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	// and save it to raftdb.
 	raftWB.SetMeta(meta.RaftStateKey(ps.region.Id), ps.raftState)
 	raftWB.MustWriteToDB(ps.Engines.Raft)
-	return result, err
+	//return result, err
+	return nil, nil
 }
 
 func (ps *PeerStorage) ClearData() {

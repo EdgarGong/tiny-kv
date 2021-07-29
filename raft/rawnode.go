@@ -78,11 +78,7 @@ type RawNode struct {
 func NewRawNode(config *Config) (*RawNode, error) {
 	// Your Code Here (2A).
 	raft := newRaft(config)
-	pHardState := pb.HardState{
-		Term: 	raft.Term,
-		Vote: 	raft.Vote,
-		Commit: raft.RaftLog.committed,
-	}
+	pHardState := raft.hardState()
 	pSoftState := SoftState{
 		Lead: 		raft.Lead,
 		RaftState: 	raft.State,
@@ -176,11 +172,8 @@ func (rn *RawNode) Ready() Ready {
 	 	ready.SoftState = softState
 	 }
 	 //?
-	 hardState := pb.HardState{
-		Term: rn.Raft.Term,
-		Vote: rn.Raft.Vote,
-		Commit: rn.Raft.RaftLog.committed,
-	}
+
+	 hardState := rn.Raft.hardState()
 	if !isHardStateEqual(hardState, rn.pHardState) {
 		ready.HardState = hardState
 		rn.pHardState = hardState
@@ -199,7 +192,7 @@ func (rn *RawNode) Ready() Ready {
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
 	r := rn.Raft
-	if hardSt := r.hardState(); !IsEmptyHardState(hardSt) && !isHardStateEqual(hardSt, rn.pHardState) {
+	if hardState := r.hardState(); !IsEmptyHardState(hardState) && !isHardStateEqual(hardState, rn.pHardState) {
 		return true
 	}
 	if len(rn.Raft.RaftLog.unstableEntries()) > 0 ||
@@ -216,6 +209,9 @@ func (rn *RawNode) HasReady() bool {
 // AKA update the RawNode
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
+	if !IsEmptyHardState(rd.HardState) {
+		rn.pHardState = rd.HardState
+	}
 	if len(rd.Entries) > 0 {
 		rn.Raft.RaftLog.stabled = rd.Entries[len(rd.Entries) - 1].Index
 	}
