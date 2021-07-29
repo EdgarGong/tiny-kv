@@ -208,6 +208,8 @@ func (ps *PeerStorage) Snapshot() (eraftpb.Snapshot, error) {
 		Receiver:  ch,
 	}
 	// schedule snapshot generate task
+	// When calling Snapshot(), it actually
+	// sends a task RegionTaskGen to the region worker
 	ps.regionSched <- &runner.RegionTaskGen{
 		RegionId: ps.region.GetId(),
 		Notifier: ch,
@@ -381,6 +383,10 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 	if err := snapData.Unmarshal(snapshot.Data); err != nil {
 		return nil, err
 	}
+
+	// update PeerStorage.snapState to snap.SnapState_Applying and
+	// send runner.RegionTaskApply task to region worker
+	// through PeerStorage.regionSched and wait until region worker finish
 
 	// Hint: things need to do here including: update peer storage state like raftState and applyState, etc,
 	// and send RegionTaskApply task to region worker through ps.regionSched, also remember call ps.clearMeta

@@ -5,7 +5,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/test_raftstore/test_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/raftstore/runner/region_task.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/runner/region_task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/storage/raft_storage/snap_runner.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/storage/raft_storage/snap_runner.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/proto/eraftpb.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/proto/eraftpb.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/raft/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/log.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/raft/raft.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/raft.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/raft/rawnode.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/rawnode.go" afterDir="false" />
@@ -50,8 +52,8 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="go" />
   </component>
-  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistPartitionUnreliable2B">
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestConcurrent2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestSnapshotRecover2C">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestOneSnapshot2C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
       <root_directory value="$PROJECT_DIR$" />
@@ -60,10 +62,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestConcurrent2B\E$" />
+      <pattern value="^\QTestOneSnapshot2C\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestManyPartitionsManyClients2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestSnapshotRecover2C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
       <root_directory value="$PROJECT_DIR$" />
@@ -72,52 +74,52 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestManyPartitionsManyClients2B\E$" />
+      <pattern value="^\QTestSnapshotRecover2C\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistConcurrentUnreliable2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestRawNodeRestartFromSnapshot2C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <working_directory value="$PROJECT_DIR$/raft" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <package value="github.com/pingcap-incubator/tinykv/raft" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestPersistConcurrentUnreliable2B\E$" />
+      <pattern value="^\QTestRawNodeRestartFromSnapshot2C\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistPartition2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestRestoreSnapshot2C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <working_directory value="$PROJECT_DIR$/raft" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <package value="github.com/pingcap-incubator/tinykv/raft" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestPersistPartition2B\E$" />
+      <pattern value="^\QTestRestoreSnapshot2C\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistPartitionUnreliable2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestSlowNodeRestore2C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <working_directory value="$PROJECT_DIR$/raft" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <package value="github.com/pingcap-incubator/tinykv/raft" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestPersistPartitionUnreliable2B\E$" />
+      <pattern value="^\QTestSlowNodeRestore2C\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistPartitionUnreliable2B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistConcurrentUnreliable2B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestManyPartitionsManyClients2B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestConcurrent2B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestPersistPartition2B" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestSnapshotRecover2C" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestOneSnapshot2C" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestRawNodeRestartFromSnapshot2C" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestSlowNodeRestore2C" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestRestoreSnapshot2C" />
       </list>
     </recent_temporary>
   </component>
@@ -169,7 +171,7 @@
         <line-breakpoint type="DlvLineBreakpoint">
           <condition expression="r.Prs[m.From].Next &lt; 4" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>712</line>
+          <line>736</line>
           <option name="timeStamp" value="159" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -179,7 +181,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>622</line>
+          <line>646</line>
           <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
@@ -194,7 +196,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>598</line>
+          <line>622</line>
           <option name="timeStamp" value="183" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -225,7 +227,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>646</line>
+          <line>670</line>
           <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -265,7 +267,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/log.go</url>
-          <line>182</line>
+          <line>194</line>
           <option name="timeStamp" value="216" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -302,20 +304,35 @@
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>432</line>
+          <line>450</line>
           <option name="timeStamp" value="224" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>499</line>
+          <line>523</line>
           <option name="timeStamp" value="225" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>636</line>
+          <line>660</line>
           <option name="timeStamp" value="226" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/raft/raft_test.go</url>
+          <line>1064</line>
+          <option name="timeStamp" value="227" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/raft/raft.go</url>
+          <line>419</line>
+          <option name="timeStamp" value="228" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/raft/raft_test.go</url>
+          <line>1062</line>
+          <option name="timeStamp" value="229" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

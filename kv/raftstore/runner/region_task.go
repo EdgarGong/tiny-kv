@@ -56,6 +56,8 @@ func NewRegionTaskHandler(engines *engine_util.Engines, mgr *snap.SnapManager) *
 }
 
 func (r *regionTaskHandler) Handle(t worker.Task) {
+	//  It scans the underlying engines to generate
+	// a snapshot, and sends snapshot metadata by channel
 	switch t.(type) {
 	case *RegionTaskGen:
 		task := t.(*RegionTaskGen)

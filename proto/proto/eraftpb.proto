@@ -32,7 +32,8 @@ message SnapshotMetadata {
 }
 
 message Snapshot {
-    bytes data = 1;
+    bytes data = 1;//not represent the actual state machine data
+    // but some metadata is used for the upper application you can ignore it for project2
     SnapshotMetadata metadata = 2;
 }
 

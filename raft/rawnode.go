@@ -199,9 +199,12 @@ func (rn *RawNode) HasReady() bool {
 		len(rn.Raft.RaftLog.nextEnts()) > 0 ||
 		len(rn.Raft.msgs) > 0{
 		return true
+	}else if !IsEmptySnap(r.RaftLog.pendingSnapshot) {//?
+		return true
 	}else{
 		return false
 	}
+
 }
 
 // Advance notifies the RawNode that the application has applied and saved progress in the

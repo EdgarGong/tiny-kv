@@ -91,6 +91,7 @@ func (r *snapRunner) sendSnap(addr string, msg *raft_serverpb.RaftMessage) error
 	if err != nil {
 		return err
 	}
+	// split the data into chunks to transport
 	err = stream.Send(&raft_serverpb.SnapshotChunk{Message: msg})
 	if err != nil {
 		return err

@@ -225,18 +225,24 @@ func newRaft(c *Config) *Raft {
 // current commit index to the given peer. Returns true if a message was sent.
 func (r *Raft) sendAppend(to uint64) bool {
 	// Your Code Here (2A).
-	//if nextIndex < r.RaftLog.FirstIndex() {
-	//r.sendSnapshot(to)
-	//return false
-	//}
+	// In 'sendAppend', if a leader fails to get term or entries,
+	//the leader requests snapshot by sending
+	// 'MessageType_MsgSnapshot' type message.
+
 	li := r.RaftLog.LastIndex()
 	ni := r.Prs[to].Next
+	logterm, err := r.RaftLog.Term(ni - 1)
+	if err != nil { //?
+		r.sendSnapshot(to)
+		//panic(err)
+		return false
+	}
 	entries := make([]*pb.Entry, 0, li - ni + 1)
 
 	for i := r.RaftLog.indexArray(ni); i < len(r.RaftLog.entries); i++{
 		entries = append(entries,&r.RaftLog.entries[i])
 	}
-	logterm, _ := r.RaftLog.Term(ni - 1)
+
 	msg := pb.Message{
 		MsgType: pb.MessageType_MsgAppend,
 		From: r.id,
@@ -303,6 +309,18 @@ func (r *Raft) sendHeartbeatResponse(to uint64, reject bool, index uint64) {
 	}
 	r.msgs = append(r.msgs, msg)
 }*/
+func (r *Raft) sendSnapshot(to uint64){
+	snapshot, _ := r.RaftLog.storage.Snapshot()
+	msg := pb.Message{
+		MsgType: pb.MessageType_MsgSnapshot,
+		From:    r.id,
+		To:      to,
+		Snapshot: &snapshot,
+	}
+	r.msgs = append(r.msgs, msg)
+	//?  r.Prs[to].Next = snapshot.Metadata.Index + 1
+}
+
 
 
 
@@ -456,6 +474,8 @@ func (r *Raft) Step(m pb.Message) error {
 				m.To = r.Lead
 				r.msgs = append(r.msgs, m)
 			}
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
 	case StateCandidate:
 		switch m.MsgType{
@@ -474,6 +494,8 @@ func (r *Raft) Step(m pb.Message) error {
 				m.To = r.Lead
 				r.msgs = append(r.msgs, m)
 			}
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
 	case StateLeader:
 		switch m.MsgType{
@@ -495,6 +517,8 @@ func (r *Raft) Step(m pb.Message) error {
 			r.appendEntry(m)
 		case pb.MessageType_MsgTransferLeader:
 			//r.handleTransferLeader(m)
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
 	}
 	return nil
@@ -828,6 +852,26 @@ func (r *Raft) hardState() pb.HardState {
 // handleSnapshot handle Snapshot RPC request
 func (r *Raft) handleSnapshot(m pb.Message) {
 	// Your Code Here (2C).
+	metadata := m.Snapshot.Metadata
+	index := metadata.Index
+	if index <= r.RaftLog.committed {
+		r.sendAppendResponse(m.From, false, r.RaftLog.committed, 0, None)
+		return
+	}else{
+		// initialize based on the Snapshot
+		r.becomeFollower(max(r.Term, m.Term), m.From)
+		r.RaftLog.entries = nil
+		r.RaftLog.FirstIndex = index + 1
+		r.RaftLog.applied = index
+		r.RaftLog.committed = index
+		r.RaftLog.stabled = index
+		r.Prs = make(map[uint64]*Progress)
+		for _, peer := range metadata.ConfState.Nodes{
+			r.Prs[peer] = &Progress{}
+		}
+		r.RaftLog.pendingSnapshot = m.Snapshot
+		r.sendAppendResponse(m.From, false, r.RaftLog.LastIndex(), 0, None)
+	}
 }
 
 // addNode add a new node to raft group
