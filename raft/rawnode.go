@@ -168,6 +168,7 @@ func (rn *RawNode) Ready() Ready {
 		 rn.Raft.State,
 	 }
 	 if rn.pSoftState.Lead != softState.Lead || rn.pSoftState.RaftState != softState.RaftState{
+	 	// in case raft's softState has been updated
 	 	rn.pSoftState = *softState
 	 	ready.SoftState = softState
 	 }
@@ -175,8 +176,8 @@ func (rn *RawNode) Ready() Ready {
 
 	 hardState := rn.Raft.hardState()
 	if !isHardStateEqual(hardState, rn.pHardState) {
-		ready.HardState = hardState
 		rn.pHardState = hardState
+		ready.HardState = hardState
 	}
 	//?
 	rn.Raft.msgs = make([]pb.Message, 0)
@@ -191,6 +192,9 @@ func (rn *RawNode) Ready() Ready {
 // HasReady called when RawNode user need to check if any Ready pending.
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
+	// if there is the intermediate state Ready,
+	// which means the raft has been updated,
+	// return true
 	r := rn.Raft
 	if hardState := r.hardState(); !IsEmptyHardState(hardState) && !isHardStateEqual(hardState, rn.pHardState) {
 		return true
@@ -212,6 +216,8 @@ func (rn *RawNode) HasReady() bool {
 // AKA update the RawNode
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
+	// in case the Ready has been handled,
+	// so we need to change the state of RawNode
 	if !IsEmptyHardState(rd.HardState) {
 		rn.pHardState = rd.HardState
 	}

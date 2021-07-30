@@ -5,6 +5,7 @@ import (
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/meta"
 	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
+	"reflect"
 	"time"
 
 	"github.com/Connor1996/badger/y"
@@ -57,41 +58,55 @@ func (d *peerMsgHandler) HandleRaftReady() {
 	}
 	rd := d.RaftGroup.Ready()
 	//saveToStorage
-	_, err := d.peerStorage.SaveReadyState(&rd)
+	result, err := d.peerStorage.SaveReadyState(&rd)
 	if err != nil {
 		panic(err)
 	}
-	/*if result != nil {
+	if result != nil {
 		if !reflect.DeepEqual(result.PrevRegion, result.Region) {
 			d.peerStorage.SetRegion(result.Region)
 			storeMeta := d.ctx.storeMeta
 			storeMeta.Lock()
-			storeMeta.regions[result.Region.Id] = result.Region
-			storeMeta.regionRanges.Delete(&regionItem{region: result.PrevRegion})
-			storeMeta.regionRanges.ReplaceOrInsert(&regionItem{region: result.Region})
+			storeMeta.regions[result.Region.GetId()] = result.Region
+			storeMeta.regionRanges.Delete(&regionItem{
+				region: result.PrevRegion})
+			storeMeta.regionRanges.ReplaceOrInsert(&regionItem{
+				region: result.Region})
 			storeMeta.Unlock()
 		}
-	}*/
+	}
 	//send(rd.Messages)
 	d.Send(d.ctx.trans, rd.Messages)
 	if len(rd.CommittedEntries) > 0{
-		prevProposals := d.proposals
+		//prevProposals := d.proposals
 		kvWB := new(engine_util.WriteBatch)
 		for _, entry := range rd.CommittedEntries {
+			// process the committed but not applied entries
 			kvWB = d.process(&entry, kvWB)
 			if d.stopped {
 				return
 			}
 		}
+		// all committed entries have been processed,
+		// so we need to update the applied_index
 		d.peerStorage.applyState.AppliedIndex = rd.CommittedEntries[len(rd.CommittedEntries)-1].Index
-		kvWB.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
-		kvWB.WriteToDB(d.peerStorage.Engines.Kv)
-		if len(prevProposals) > len(d.proposals) {
+		// update the applyState in DB
+		err := kvWB.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
+		if err != nil {
+			return
+		}
+		err = kvWB.WriteToDB(d.peerStorage.Engines.Kv)
+		if err != nil {
+			return
+		}
+		//???
+		/*if len(prevProposals) > len(d.proposals) {
 			// update d.proposals
+			// the proposals is for response
 			proposals := make([]*proposal, len(d.proposals))
 			copy(proposals, d.proposals)
 			d.proposals = proposals
-		}
+		}*/
 	}
 	d.RaftGroup.Advance(rd)
 
@@ -123,14 +138,17 @@ func (d *peerMsgHandler) processAdminCmd(entry *eraftpb.Entry, msg *raft_cmdpb.R
 	req := msg.AdminRequest
 	switch req.CmdType {
 	case raft_cmdpb.AdminCmdType_CompactLog:
-		/*compactLog := req.GetCompactLog()
-		applySt := d.peerStorage.applyState
-		if compactLog.CompactIndex >= applySt.TruncatedState.Index {
-			applySt.TruncatedState.Index = compactLog.CompactIndex
-			applySt.TruncatedState.Term = compactLog.CompactTerm
-			wb.SetMeta(meta.ApplyStateKey(d.regionId), applySt)
-			d.ScheduleCompactLog(applySt.TruncatedState.Index)
-		}*/
+		compactLog := req.GetCompactLog()
+		if compactLog.CompactIndex >= d.peerStorage.applyState.TruncatedState.Index{
+			// CompactLogRequest modifies metadata,
+			// namely updates the RaftTruncatedState
+			// which is in the RaftApplyState
+			d.peerStorage.applyState.TruncatedState.Index = compactLog.CompactIndex
+			d.peerStorage.applyState.TruncatedState.Term = compactLog.CompactTerm
+			wb.SetMeta(meta.ApplyStateKey(d.regionId),d.peerStorage.applyState)
+			//schedule a task to raftlog-gc worker by ScheduleCompactLog
+			d.ScheduleCompactLog(d.peerStorage.applyState.TruncatedState.Index)
+		}
 	case raft_cmdpb.AdminCmdType_Split:
 		//3B
 	}
@@ -140,6 +158,7 @@ func (d *peerMsgHandler) processRequest(entry *eraftpb.Entry, msg *raft_cmdpb.Ra
 	req := msg.Requests[0]
 	key := getRequestKey(req)
 	if key != nil {
+		// check if key is in a region
 		err := util.CheckKeyInRegion(key, d.Region())
 		if err != nil {
 			d.handleProposal(entry, func(p *proposal) {
@@ -164,6 +183,7 @@ func (d *peerMsgHandler) processRequest(entry *eraftpb.Entry, msg *raft_cmdpb.Ra
 		}
 		switch req.CmdType {
 		case raft_cmdpb.CmdType_Get:
+			// update the ApplyState
 			d.peerStorage.applyState.AppliedIndex = entry.Index
 			err := wb.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
 			if err != nil {
@@ -330,6 +350,12 @@ func (d *peerMsgHandler) proposeAdminRequest(msg *raft_cmdpb.RaftCmdRequest, cb 
 		//3B
 	case raft_cmdpb.AdminCmdType_CompactLog:
 		// decode the entry
+		data, err := msg.Marshal()
+		if err != nil{
+			panic(err)
+		}else{
+			d.RaftGroup.Propose(data)
+		}
 		/*data, err := msg.Marshal()
 		if err != nil{
 			panic(err)
@@ -669,8 +695,6 @@ func (d *peerMsgHandler) findSiblingRegion() (result *metapb.Region) {
 }
 
 func (d *peerMsgHandler) onRaftGCLogTick() {
-	//Raftstore checks whether it needs to gc log
-	// from time to time based on the config RaftLogGcCountLimit
 	d.ticker.schedule(PeerTickRaftLogGC)
 	if !d.IsLeader() {
 		return
@@ -679,6 +703,8 @@ func (d *peerMsgHandler) onRaftGCLogTick() {
 	appliedIdx := d.peerStorage.AppliedIndex()
 	firstIdx, _ := d.peerStorage.FirstIndex()
 	var compactIdx uint64
+	// Raftstore checks whether it needs to gc log
+	// from time to time based on the config RaftLogGcCountLimit
 	if appliedIdx > firstIdx && appliedIdx-firstIdx >= d.ctx.cfg.RaftLogGcCountLimit {
 		compactIdx = appliedIdx
 	} else {
@@ -686,9 +712,9 @@ func (d *peerMsgHandler) onRaftGCLogTick() {
 	}
 
 	y.Assert(compactIdx > 0)
-	compactIdx -= 1
+	compactIdx -= 1 // compactIdx : appliedIdx - 1
 	if compactIdx < firstIdx {
-		// In case compact_idx == first_idx before subtraction.
+		// In case compact_idx(applied_idx) == first_idx before subtraction.
 		return
 	}
 
@@ -699,8 +725,6 @@ func (d *peerMsgHandler) onRaftGCLogTick() {
 	}
 
 	// Create a compact log request and notify directly.
-	// If need to gc log, it will propose a
-	// raft admin command CompactLogRequest
 	regionID := d.regionId
 	request := newCompactLogRequest(regionID, d.Meta, compactIdx, term)
 	d.proposeRaftCommand(request, nil)

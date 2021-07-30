@@ -36,6 +36,7 @@ type RaftLog struct {
 
 	// applied is the highest log position that the application has
 	// been instructed to apply to its state machine.
+	// applied entry means it has been processed (in handleRaftReady)
 	// Invariant: applied <= committed
 	applied uint64
 
@@ -84,6 +85,14 @@ func newLog(storage Storage) *RaftLog {
 // grow unlimitedly in memory
 func (l *RaftLog) maybeCompact() {
 	// Your Code Here (2C).
+	// update the firstIndex
+	stoFirst, _ := l.storage.FirstIndex()
+	if stoFirst > l.FirstIndex{
+		l.FirstIndex = stoFirst
+		if len(l.entries) > 0{
+			l.entries = l.entries[l.indexArray(stoFirst):]
+		}
+	}
 }
 
 // unstableEntries return all the unstable entries
@@ -161,11 +170,12 @@ func (l *RaftLog) Term(i uint64) (uint64, error) {
 	}else{
 		term, err := l.storage.Term(i)
 		if err == ErrUnavailable && !IsEmptySnap(l.pendingSnapshot){
+			//?
 			if i == l.pendingSnapshot.Metadata.Index {//?
-				term = l.pendingSnapshot.Metadata.Term
-				err = nil
-			} else if i < l.pendingSnapshot.Metadata.Index {
-				err = ErrCompacted
+				return l.pendingSnapshot.Metadata.Term, nil
+			}
+			if i < l.pendingSnapshot.Metadata.Index {
+				return term, ErrCompacted
 			}
 		}
 		return term, err

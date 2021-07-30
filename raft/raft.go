@@ -233,9 +233,14 @@ func (r *Raft) sendAppend(to uint64) bool {
 	ni := r.Prs[to].Next
 	logterm, err := r.RaftLog.Term(ni - 1)
 	if err != nil { //?
-		r.sendSnapshot(to)
-		//panic(err)
-		return false
+		if err == ErrCompacted{
+			r.sendSnapshot(to)
+			//panic(err)
+			return false
+		}else{
+			panic(err)
+		}
+
 	}
 	entries := make([]*pb.Entry, 0, li - ni + 1)
 
@@ -318,7 +323,7 @@ func (r *Raft) sendSnapshot(to uint64){
 		Snapshot: &snapshot,
 	}
 	r.msgs = append(r.msgs, msg)
-	//?  r.Prs[to].Next = snapshot.Metadata.Index + 1
+	  r.Prs[to].Next = snapshot.Metadata.Index + 1
 }
 
 
