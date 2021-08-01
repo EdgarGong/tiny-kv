@@ -379,7 +379,7 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 // ApplySnapshot Apply the peer with given snapshot
 func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_util.WriteBatch, raftWB *engine_util.WriteBatch) (*ApplySnapResult, error) {
 	log.Infof("%v begin to apply snapshot", ps.Tag)
-	snapData := new(rspb.RaftSnapshotData)
+	snapData := new(rspb.RaftSnapshotData)//new state
 	if err := snapData.Unmarshal(snapshot.Data); err != nil {
 		return nil, err
 	}
@@ -397,7 +397,7 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 		if err := ps.clearMeta(kvWB,raftWB); err != nil{
 			return nil, err
 		}
-		//Delete all data that is not covered by `new_region`
+		//Delete all data that is not covered by `new_region`(snapData.Region)
 		ps.clearExtraData(snapData.Region)
 	}
 	index := snapshot.Metadata.Index

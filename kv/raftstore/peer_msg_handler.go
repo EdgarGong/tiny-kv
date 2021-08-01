@@ -64,14 +64,19 @@ func (d *peerMsgHandler) HandleRaftReady() {
 	}
 	if result != nil {
 		if !reflect.DeepEqual(result.PrevRegion, result.Region) {
+			// update the information of region
 			d.peerStorage.SetRegion(result.Region)
 			storeMeta := d.ctx.storeMeta
 			storeMeta.Lock()
 			storeMeta.regions[result.Region.GetId()] = result.Region
-			storeMeta.regionRanges.Delete(&regionItem{
-				region: result.PrevRegion})
-			storeMeta.regionRanges.ReplaceOrInsert(&regionItem{
-				region: result.Region})
+			storeMeta.regionRanges.Delete(
+				&regionItem{
+					region: result.PrevRegion,
+				})
+			storeMeta.regionRanges.ReplaceOrInsert(
+				&regionItem{
+					region: result.Region,
+				})
 			storeMeta.Unlock()
 		}
 	}
@@ -167,7 +172,7 @@ func (d *peerMsgHandler) processRequest(entry *eraftpb.Entry, msg *raft_cmdpb.Ra
 			return wb
 		}
 	}
-	// apply to kv
+	// apply
 	switch req.CmdType {
 	case raft_cmdpb.CmdType_Get:
 	case raft_cmdpb.CmdType_Put:

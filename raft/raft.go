@@ -315,7 +315,14 @@ func (r *Raft) sendHeartbeatResponse(to uint64, reject bool, index uint64) {
 	r.msgs = append(r.msgs, msg)
 }*/
 func (r *Raft) sendSnapshot(to uint64){
-	snapshot, _ := r.RaftLog.storage.Snapshot()
+	snapshot, err := r.RaftLog.storage.Snapshot()
+	if err != nil{
+		// Snapshot returns the most recent snapshot.
+		// If snapshot is temporarily unavailable, it should return ErrSnapshotTemporarilyUnavailable,
+		// so raft state machine could know that Storage needs some time to prepare
+		// snapshot and call Snapshot later.
+		return
+	}
 	msg := pb.Message{
 		MsgType: pb.MessageType_MsgSnapshot,
 		From:    r.id,
@@ -323,7 +330,10 @@ func (r *Raft) sendSnapshot(to uint64){
 		Snapshot: &snapshot,
 	}
 	r.msgs = append(r.msgs, msg)
-	  r.Prs[to].Next = snapshot.Metadata.Index + 1
+	//if snapshot == nil{
+		//panic(ErrUnavailable)
+	//}
+	r.Prs[to].Next = snapshot.Metadata.Index + 1
 }
 
 
