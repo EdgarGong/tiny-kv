@@ -278,7 +278,63 @@ func (c *RaftCluster) handleStoreHeartbeat(stats *schedulerpb.StoreStats) error 
 
 // processRegionHeartbeat updates the region information.
 func (c *RaftCluster) processRegionHeartbeat(region *core.RegionInfo) error {
+	//RegionInfo contains information about the sender region of this heartbeat.
 	// Your Code Here (3C).
+
+	// Simply speaking, you could organize the check routine in the below way:
+	//
+	//  1. Check whether there is a region with the same Id in local storage.
+	//  If there is and at least one of the heartbeats’ conf_ver and version is
+	//  less than its, this heartbeat region is stale
+	//
+	//  2. If there isn’t, scan all regions that overlap with it.
+	//  The heartbeats’ conf_ver and version should be greater or equal than all of them,
+	//  or the region is stale.
+	hbEpoch := region.GetRegionEpoch()
+	stale := false
+	localRegion := c.GetRegion(region.GetID())
+	if localRegion != nil{
+		localEpoch := localRegion.GetRegionEpoch()
+		if hbEpoch.ConfVer < localEpoch.ConfVer ||
+			hbEpoch.Version < localEpoch.Version{
+			stale = true
+		}
+	} else{
+		regions := c.ScanRegions(region.GetStartKey(), region.GetEndKey(), -1)
+		for _, lRegion := range regions{
+			lEpoch := lRegion.GetRegionEpoch()
+			if hbEpoch.ConfVer < lEpoch.ConfVer ||
+				hbEpoch.Version < lEpoch.Version{
+				stale = true
+				break
+			}
+		}
+	}
+	if stale == true{
+		return errors.Errorf("This heartbeat region is stale")
+	}
+	// Then how the Scheduler determines whether it could skip this update? We can list some simple conditions:
+	//
+	//If the new one’s version or conf_ver is greater than the original one, it cannot be skipped
+	//
+	//If the leader changed, it cannot be skipped
+	//
+	//If the new one or original one has pending peer, it cannot be skipped
+	//
+	//If the ApproximateSize changed, it cannot be skipped
+	//
+	//…
+
+	// ?????
+
+	// update
+	if err := c.putRegion(region) ; err != nil {
+		return err
+	}
+	for Id := range region.GetStoreIds(){
+		c.updateStoreStatusLocked(Id)
+	}
+
 
 	return nil
 }

@@ -159,6 +159,8 @@ type Raft struct {
 	// (Used in 3A leader transfer)
 	leadTransferee uint64
 
+	transferring bool
+
 	// Only one conf change may be pending (in the log, but not yet
 	// applied) at a time. This is enforced via PendingConfIndex, which
 	// is set to a value >= the log index of the latest pending
@@ -167,6 +169,7 @@ type Raft struct {
 	// value.
 	// (Used in 3A conf change)
 	PendingConfIndex uint64
+
 }
 
 // newRaft return a raft peer with the given config
@@ -196,6 +199,7 @@ func newRaft(c *Config) *Raft {
 		//heartbeatElapsed: 	0,
 		leadTransferee: 0,
 		PendingConfIndex: 0,
+		transferring: false,
 	}
 	li, _ := c.Storage.LastIndex()
 	if c.peers == nil {
@@ -305,7 +309,7 @@ func (r *Raft) sendHeartbeatResponse(to uint64, reject bool, index uint64) {
 	r.msgs = append(r.msgs, msg)
 }
 
-/*func (r *Raft) sendTimeoutNow(to uint64) {
+func (r *Raft) sendTimeoutNow(to uint64) {
 	// maybe in 3A
 	msg := pb.Message{
 		MsgType: pb.MessageType_MsgTimeoutNow,
@@ -313,7 +317,7 @@ func (r *Raft) sendHeartbeatResponse(to uint64, reject bool, index uint64) {
 		To:      to,
 	}
 	r.msgs = append(r.msgs, msg)
-}*/
+}
 func (r *Raft) sendSnapshot(to uint64){
 	snapshot, err := r.RaftLog.storage.Snapshot()
 	if err != nil{
@@ -460,7 +464,12 @@ func (r *Raft) becomeLeader() {
 // on `eraftpb.proto` for what msgs should be handled
 func (r *Raft) Step(m pb.Message) error {
 	// Your Code Here (2A).
-
+	_, ok := r.Prs[r.id]
+	if m.MsgType == pb.MessageType_MsgTimeoutNow && !ok {
+		// when a MessageType_MsgTimeoutNow arrives at
+		// a node that has been removed from the group, nothing happens
+		return nil
+	}
 	//Can be merged!!!
 	switch r.State {
 	case StateFollower:
@@ -483,7 +492,10 @@ func (r *Raft) Step(m pb.Message) error {
 		case pb.MessageType_MsgHeartbeat:
 			r.handleHeartbeat(m)
 		case pb.MessageType_MsgTimeoutNow:
-			//r.electionElapsed = r.electionTimeout//?
+			//after receiving a MsgTimeoutNow message
+			// the transferee should start a new election immediately
+			// regardless of its election timeout
+			r.campaign()
 		case pb.MessageType_MsgTransferLeader:
 			if r.Lead != None{
 				m.To = r.Lead
@@ -529,9 +541,16 @@ func (r *Raft) Step(m pb.Message) error {
 		case pb.MessageType_MsgAppendResponse:
 			r.handleAppendResponse(m)
 		case pb.MessageType_MsgPropose:
-			r.appendEntry(m)
+			// If the transferee’s log is not up to date,
+			// the current leader should send a MsgAppend message
+			// to the transferee and stop accepting new proposals
+			// in case we end up cycling
+			if !r.transferring{
+				r.appendEntry(m)
+			}
+
 		case pb.MessageType_MsgTransferLeader:
-			//r.handleTransferLeader(m)
+			r.handleTransferLeader(m)
 		case pb.MessageType_MsgSnapshot:
 			r.handleSnapshot(m)
 		}
@@ -759,6 +778,7 @@ func (r *Raft) handleAppendResponse(m pb.Message) {
 		// a log entry is committed once the
 		// leader that created the entry has replicated it
 		// on a majority of the servers
+		// ???if len(r.Prs) == 1
 		logTerm, _ := r.RaftLog.Term(m.Index)
 		if m.Index > 0 &&  r.Term != logTerm{
 			return
@@ -772,6 +792,13 @@ func (r *Raft) handleAppendResponse(m pb.Message) {
 		if count >= len(r.Prs) / 2{
 			r.RaftLog.committed = max(m.Index, r.RaftLog.applied)
 			r.bcastAppend() // update everyone's "commit"
+		}
+
+		if m.From == r.leadTransferee && m.Index == r.RaftLog.LastIndex() {
+			r.sendTimeoutNow(m.From)
+			r.leadTransferee = None
+			//???
+			r.transferring = false
 		}
 	}
 }
@@ -809,6 +836,7 @@ func (r *Raft) appendEntry(m pb.Message) {
 	// Your Code Here (2A).
 	index := r.RaftLog.LastIndex()
 	for i := 0; i < len(m.Entries); i++ {
+		// ?????? r.PendingConfIndex
 		entry := *m.Entries[i]
 		index++
 		entry.Term = r.Term
@@ -836,25 +864,32 @@ func (r *Raft) appendEntry(m pb.Message) {
 
 }
 
-/*func (r *Raft) handleTransferLeader(m pb.Message) {
+func (r *Raft) handleTransferLeader(m pb.Message) {
 	//???
-	if m.From == r.id {
+	/*if m.From == r.id {
 		return
-	}
+	}*/
 	if r.leadTransferee != None && r.leadTransferee == m.From {
 		return
 	}
 	if _, ok := r.Prs[m.From]; !ok {
+		// Transfer leadership to non-existing node, there will be noop.
 		return
 	}
 	r.leadTransferee = m.From
 	//r.transferElapsed = 0
 	if r.Prs[m.From].Match == r.RaftLog.LastIndex() {
+		// the current leader should first
+		// check the qualification of the transferee
 		r.sendTimeoutNow(m.From)
 	} else {
+		// If the transferee’s log is not up to date,
+		// the current leader should send a MsgAppend message
+		// to the transferee and stop accepting new proposals
+		r.transferring = true
 		r.sendAppend(m.From)
 	}
-}*/
+}
 
 func (r *Raft) hardState() pb.HardState {
 	return pb.HardState{
@@ -892,9 +927,44 @@ func (r *Raft) handleSnapshot(m pb.Message) {
 // addNode add a new node to raft group
 func (r *Raft) addNode(id uint64) {
 	// Your Code Here (3A).
+	if _, ok := r.Prs[id]; !ok{
+		r.Prs[id] = &Progress{
+			Match: 0,
+			Next: 1, //?
+		}
+	}
 }
 
 // removeNode remove a node from raft group
 func (r *Raft) removeNode(id uint64) {
 	// Your Code Here (3A).
+	if _, ok := r.Prs[id]; ok{
+		delete(r.Prs, id)
+		//?
+		//logTerm, _ := r.RaftLog.Term(m.Index)
+		//if m.Index > 0 &&  r.Term != logTerm{
+			//return
+		//}
+		if r.State == StateLeader{
+			if len(r.Prs) == 1{
+				if r.Prs[r.id].Match > r.RaftLog.committed{
+					r.RaftLog.committed = r.Prs[r.id].Match
+					r.bcastAppend()
+				}
+			}else{
+				count := 0
+				for peer, progress := range r.Prs{
+					if peer != r.id && progress.Match > r.RaftLog.committed{
+						count++
+					}
+				}
+				if count >= len(r.Prs) / 2{
+					r.RaftLog.committed = r.RaftLog.applied
+					r.bcastAppend() // update everyone's "commit"
+				}
+			}
+
+		}
+	}
+
 }
