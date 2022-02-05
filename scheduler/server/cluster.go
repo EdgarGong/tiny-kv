@@ -291,26 +291,31 @@ func (c *RaftCluster) processRegionHeartbeat(region *core.RegionInfo) error {
 	//  The heartbeats’ conf_ver and version should be greater or equal than all of them,
 	//  or the region is stale.
 	hbEpoch := region.GetRegionEpoch()
+	if hbEpoch == nil {
+		return errors.Errorf("region has no epoch")
+	}
 	stale := false
 	localRegion := c.GetRegion(region.GetID())
-	if localRegion != nil{
+	//Check whether there is a region with the same Id in local storage
+	if localRegion != nil {
 		localEpoch := localRegion.GetRegionEpoch()
 		if hbEpoch.ConfVer < localEpoch.ConfVer ||
-			hbEpoch.Version < localEpoch.Version{
+			hbEpoch.Version < localEpoch.Version {
 			stale = true
 		}
-	} else{
+	} else {
+		//If there isn’t, scan all regions that overlap with it.
 		regions := c.ScanRegions(region.GetStartKey(), region.GetEndKey(), -1)
-		for _, lRegion := range regions{
+		for _, lRegion := range regions {
 			lEpoch := lRegion.GetRegionEpoch()
 			if hbEpoch.ConfVer < lEpoch.ConfVer ||
-				hbEpoch.Version < lEpoch.Version{
+				hbEpoch.Version < lEpoch.Version {
 				stale = true
 				break
 			}
 		}
 	}
-	if stale == true{
+	if stale == true {
 		return errors.Errorf("This heartbeat region is stale")
 	}
 	// Then how the Scheduler determines whether it could skip this update? We can list some simple conditions:
@@ -328,13 +333,12 @@ func (c *RaftCluster) processRegionHeartbeat(region *core.RegionInfo) error {
 	// ?????
 
 	// update
-	if err := c.putRegion(region) ; err != nil {
+	if err := c.putRegion(region); err != nil {
 		return err
 	}
-	for Id := range region.GetStoreIds(){
+	for Id := range region.GetStoreIds() {
 		c.updateStoreStatusLocked(Id)
 	}
-
 
 	return nil
 }

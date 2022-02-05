@@ -14,10 +14,12 @@
 package schedulers
 
 import (
+	"fmt"
 	"github.com/pingcap-incubator/tinykv/scheduler/server/core"
 	"github.com/pingcap-incubator/tinykv/scheduler/server/schedule"
 	"github.com/pingcap-incubator/tinykv/scheduler/server/schedule/operator"
 	"github.com/pingcap-incubator/tinykv/scheduler/server/schedule/opt"
+	"sort"
 )
 
 func init() {
@@ -75,8 +77,102 @@ func (s *balanceRegionScheduler) IsScheduleAllowed(cluster opt.Cluster) bool {
 	return s.opController.OperatorCount(operator.OpRegion) < cluster.GetRegionScheduleLimit()
 }
 
+type Stores []*core.StoreInfo
+
+func (a Stores) Len() int {
+	return len(a)
+}
+
+func (a Stores) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a Stores) Less(i, j int) bool {
+	return a[i].GetRegionSize() < a[j].GetRegionSize()
+}
+
 func (s *balanceRegionScheduler) Schedule(cluster opt.Cluster) *operator.Operator {
 	// Your Code Here (3C).
+	//In short, a suitable store should be up and the down time cannot be
+	//longer than MaxStoreDownTime of the cluster, which you can get through cluster.GetMaxStoreDownTime().
+	stores := make(Stores, 0)
+	for _, store := range cluster.GetStores() {
+		if store.IsUp() && store.DownTime() < cluster.GetMaxStoreDownTime() {
+			stores = append(stores, store)
+		}
+	}
+	n := len(stores)
+	if n < 2 {
+		return nil
+	}
+	sort.Sort(stores)
+	var region *core.RegionInfo
+	var regions core.RegionsContainer
+	//The scheduler will try to find the region most suitable for moving in the store.
+	//First, it will try to select a pending region because pending may mean the disk is overloaded.
+	//If there isn’t a pending region, it will try to find a follower region.
+	//If it still cannot pick out one region, it will try to pick leader regions.
+	//Finally, it will select out the region to move,
+	//or the Scheduler will try the next store which has a smaller region size
+	//until all stores will have been tried.
+	i := n - 1
+	for ; i > 0; i-- {
 
-	return nil
+		cluster.GetPendingRegionsWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
+		region = regions.RandomRegion(nil, nil)
+		if region != nil {
+			break
+		}
+		cluster.GetFollowersWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
+		region = regions.RandomRegion(nil, nil)
+		if region != nil {
+			break
+		}
+		cluster.GetLeadersWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
+		region = regions.RandomRegion(nil, nil)
+		if region != nil {
+			break
+		}
+	}
+	if region == nil {
+		return nil
+	}
+	var orgStore, tgtStore *core.StoreInfo
+	orgStore = stores[i]
+	//GetStoreIds returns a map indicate the region distributed.
+	storeIds := region.GetStoreIds()
+	if len(storeIds) < cluster.GetMaxReplicas() {
+		//?????
+		return nil
+	}
+	for j := 0; j < i; j++ {
+		// choose the target store
+		//Actually, the Scheduler will select the store with the smallest region size.
+		if _, ok := storeIds[stores[j].GetID()]; !ok {
+			// ?????
+			tgtStore = stores[j]
+			break
+		}
+	}
+	if tgtStore == nil {
+		return nil
+	}
+	if orgStore.GetRegionSize()-tgtStore.GetRegionSize() < 2*region.GetApproximateSize() {
+		//we have to make sure that the difference has to be bigger than
+		//two times the approximate size of the region
+		return nil
+	}
+	//If the difference is big enough,
+	//the Scheduler should allocate a new peer on the target store
+	//and create a move peer operator.
+	newPeer, err := cluster.AllocPeer(tgtStore.GetID())
+	if err != nil {
+		return nil
+	}
+	desc := fmt.Sprintf("move-from-%d-to-%d", orgStore.GetID(), tgtStore.GetID())
+	op, err := operator.CreateMovePeerOperator(desc, cluster, region, operator.OpBalance, orgStore.GetID(), tgtStore.GetID(), newPeer.GetId())
+	if err != nil {
+		return nil
+	}
+	return op
 }

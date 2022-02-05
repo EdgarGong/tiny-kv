@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e95a819b-51ae-420a-bf78-f92a05d19700" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raft/raft.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/raft.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scheduler/server/cluster.go" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler/server/cluster.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +29,9 @@
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="1vhnJDe0rYDxrDKPKReb1afGjoe" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -39,11 +42,13 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.format.on.save.advertiser.fired" value="true" />
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
+    <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../tinykv-master2" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -135,9 +140,9 @@
       <list>
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestTransferNonMember3A" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferSecondTransferToAnotherNode3A" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferBack3A" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferRemoveNode3A" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferReceiveHigherTermVote3A" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferBack3A" />
       </list>
     </recent_temporary>
   </component>
