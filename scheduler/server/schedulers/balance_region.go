@@ -96,18 +96,19 @@ func (s *balanceRegionScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 	//In short, a suitable store should be up and the down time cannot be
 	//longer than MaxStoreDownTime of the cluster, which you can get through cluster.GetMaxStoreDownTime().
 	stores := make(Stores, 0)
-	for _, store := range cluster.GetStores() {
+	cluStores := cluster.GetStores()
+	for _, store := range cluStores {
 		if store.IsUp() && store.DownTime() < cluster.GetMaxStoreDownTime() {
 			stores = append(stores, store)
 		}
 	}
-	n := len(stores)
-	if n < 2 {
+	l := len(stores)
+	if l <= 1 {
 		return nil
 	}
 	sort.Sort(stores)
 	var region *core.RegionInfo
-	var regions core.RegionsContainer
+	var regionCon core.RegionsContainer
 	//The scheduler will try to find the region most suitable for moving in the store.
 	//First, it will try to select a pending region because pending may mean the disk is overloaded.
 	//If there isn’t a pending region, it will try to find a follower region.
@@ -115,26 +116,30 @@ func (s *balanceRegionScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 	//Finally, it will select out the region to move,
 	//or the Scheduler will try the next store which has a smaller region size
 	//until all stores will have been tried.
-	i := n - 1
+	i := l - 1
 	for ; i > 0; i-- {
 
-		cluster.GetPendingRegionsWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
-		region = regions.RandomRegion(nil, nil)
+		cluster.GetPendingRegionsWithLock(stores[i].GetID(),
+			func(rc core.RegionsContainer) { regionCon = rc })
+		region = regionCon.RandomRegion(nil, nil)
 		if region != nil {
 			break
 		}
-		cluster.GetFollowersWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
-		region = regions.RandomRegion(nil, nil)
+		cluster.GetFollowersWithLock(stores[i].GetID(),
+			func(rc core.RegionsContainer) { regionCon = rc })
+		region = regionCon.RandomRegion(nil, nil)
 		if region != nil {
 			break
 		}
-		cluster.GetLeadersWithLock(stores[i].GetID(), func(rc core.RegionsContainer) { regions = rc })
-		region = regions.RandomRegion(nil, nil)
+		cluster.GetLeadersWithLock(stores[i].GetID(),
+			func(rc core.RegionsContainer) { regionCon = rc })
+		region = regionCon.RandomRegion(nil, nil)
 		if region != nil {
 			break
 		}
 	}
 	if region == nil {
+		//all stores will have been tried but there is no suitable store and region
 		return nil
 	}
 	var orgStore, tgtStore *core.StoreInfo
@@ -147,9 +152,10 @@ func (s *balanceRegionScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 	}
 	for j := 0; j < i; j++ {
 		// choose the target store
-		//Actually, the Scheduler will select the store with the smallest region size.
+		//select the store with the smallest region size and.
+
 		if _, ok := storeIds[stores[j].GetID()]; !ok {
-			// ?????
+			// there's not any part of this region in this store
 			tgtStore = stores[j]
 			break
 		}
@@ -169,7 +175,8 @@ func (s *balanceRegionScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 	if err != nil {
 		return nil
 	}
-	desc := fmt.Sprintf("move-from-%d-to-%d", orgStore.GetID(), tgtStore.GetID())
+	//!!!
+	desc := fmt.Sprintf("move from store %d to store %d", orgStore.GetID(), tgtStore.GetID())
 	op, err := operator.CreateMovePeerOperator(desc, cluster, region, operator.OpBalance, orgStore.GetID(), tgtStore.GetID(), newPeer.GetId())
 	if err != nil {
 		return nil

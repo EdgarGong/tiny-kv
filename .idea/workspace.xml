@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e95a819b-51ae-420a-bf78-f92a05d19700" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduler/server/cluster.go" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler/server/cluster.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/transaction/mvcc/scanner.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/transaction/mvcc/scanner.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/transaction/mvcc/transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/transaction/mvcc/transaction.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,7 +58,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="go" />
   </component>
-  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestTransferNonMember3A">
+  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$" />
@@ -76,73 +78,73 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferBack3A" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/raft" />
+      <working_directory value="$PROJECT_DIR$/kv/transaction" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/raft" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestLeaderTransferBack3A\E$" />
+      <pattern value="^\QTestCheckTxnStatusTtlExpired4C\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferReceiveHigherTermVote3A" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetLocked4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/raft" />
+      <working_directory value="$PROJECT_DIR$/kv/transaction" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/raft" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestLeaderTransferReceiveHigherTermVote3A\E$" />
+      <pattern value="^\QTestGetLocked4B\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferRemoveNode3A" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetVersions4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/raft" />
+      <working_directory value="$PROJECT_DIR$/kv/transaction" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/raft" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestLeaderTransferRemoveNode3A\E$" />
+      <pattern value="^\QTestGetVersions4B\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferSecondTransferToAnotherNode3A" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSingleCommit4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/raft" />
+      <working_directory value="$PROJECT_DIR$/kv/transaction" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/raft" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestLeaderTransferSecondTransferToAnotherNode3A\E$" />
+      <pattern value="^\QTestSingleCommit4B\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/raft 中的 TestTransferNonMember3A" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSinglePrewrite4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/raft" />
+      <working_directory value="$PROJECT_DIR$/kv/transaction" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/raft" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestTransferNonMember3A\E$" />
+      <pattern value="^\QTestSinglePrewrite4B\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestTransferNonMember3A" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferSecondTransferToAnotherNode3A" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferRemoveNode3A" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferReceiveHigherTermVote3A" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/raft 中的 TestLeaderTransferBack3A" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSingleCommit4B" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSinglePrewrite4B" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetLocked4B" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetVersions4B" />
       </list>
     </recent_temporary>
   </component>
