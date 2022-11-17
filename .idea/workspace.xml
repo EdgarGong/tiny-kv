@@ -6,10 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="e95a819b-51ae-420a-bf78-f92a05d19700" name="默认变更列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/raftstore/peer_storage.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kv/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/server/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/transaction/mvcc/scanner.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/transaction/mvcc/scanner.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kv/transaction/mvcc/transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/transaction/mvcc/transaction.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" beforeDir="false" afterPath="$PROJECT_DIR$/scheduler/server/schedulers/balance_region.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kv/storage/standalone_storage/standalone_storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/kv/storage/standalone_storage/standalone_storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raft/raft.go" beforeDir="false" afterPath="$PROJECT_DIR$/raft/raft.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,25 +41,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="go.format.on.save.advertiser.fired" value="true" />
-    <property name="go.formatter.settings.were.checked" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
-    <property name="go.sdk.automatically.set" value="true" />
-    <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../tinykv-master2" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="go" />
-  </component>
-  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C">
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "/home/edgar/goProject/src/no",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
+  }
+}]]></component>
+  <component name="RunManager" selected="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestUnreliable2B">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$" />
@@ -78,6 +79,30 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestTransferLeader3B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="tiny-kv" />
+      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestTransferLeader3B\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestUnreliable2B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="tiny-kv" />
+      <working_directory value="$PROJECT_DIR$/kv/test_raftstore" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pingcap-incubator/tinykv/kv/test_raftstore" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestUnreliable2B\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="tiny-kv" />
       <working_directory value="$PROJECT_DIR$/kv/transaction" />
@@ -88,30 +113,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestCheckTxnStatusTtlExpired4C\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetLocked4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/kv/transaction" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestGetLocked4B\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetVersions4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="tiny-kv" />
-      <working_directory value="$PROJECT_DIR$/kv/transaction" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pingcap-incubator/tinykv/kv/transaction" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestGetVersions4B\E$" />
       <method v="2" />
     </configuration>
     <configuration name="github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSingleCommit4B" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -140,11 +141,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestUnreliable2B" />
+        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/test_raftstore 中的 TestTransferLeader3B" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestCheckTxnStatusTtlExpired4C" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSingleCommit4B" />
         <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestSinglePrewrite4B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetLocked4B" />
-        <item itemvalue="Go 测试.github.com/pingcap-incubator/tinykv/kv/transaction 中的 TestGetVersions4B" />
       </list>
     </recent_temporary>
   </component>
@@ -153,7 +154,7 @@
     <option name="version" value="3" />
   </component>
   <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
+    <settings-migrated>true</settings-migrated>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -196,7 +197,7 @@
         <line-breakpoint type="DlvLineBreakpoint">
           <condition expression="r.Prs[m.From].Next &lt; 4" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>770</line>
+          <line>762</line>
           <option name="timeStamp" value="159" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -206,7 +207,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>680</line>
+          <line>675</line>
           <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
@@ -221,7 +222,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>656</line>
+          <line>651</line>
           <option name="timeStamp" value="183" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -252,7 +253,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>704</line>
+          <line>699</line>
           <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -324,19 +325,19 @@
         <line-breakpoint type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>474</line>
+          <line>469</line>
           <option name="timeStamp" value="224" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>557</line>
+          <line>552</line>
           <option name="timeStamp" value="225" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <condition expression="r.RaftLog.committed &lt; r.RaftLog.applied" language="go" />
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>694</line>
+          <line>689</line>
           <option name="timeStamp" value="226" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -351,12 +352,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/kv/raftstore/peer_msg_handler.go</url>
-          <line>112</line>
+          <line>113</line>
           <option name="timeStamp" value="230" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/raft/raft.go</url>
-          <line>327</line>
+          <line>326</line>
           <option name="timeStamp" value="231" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -378,6 +379,11 @@
           <url>file://$PROJECT_DIR$/raft/raft_test.go</url>
           <line>1240</line>
           <option name="timeStamp" value="239" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/kv/test_raftstore/test_test.go</url>
+          <line>543</line>
+          <option name="timeStamp" value="241" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -332,7 +332,7 @@ func ClearMeta(engines *engine_util.Engines, kvWB, raftWB *engine_util.WriteBatc
 }
 
 // Append the given entries to the raft log and update ps.raftState also delete log entries that will
-//// never be committed
+// never be committed
 // To append log entries, simply save all log entries at raft.Ready.Entries to raftdb
 // and delete any previously appended log entries which will never be committed.
 // Also, update the peer storage’s RaftLocalState and save it to raftdb.
@@ -344,7 +344,7 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 	// previous last index
 	pli := ps.raftState.LastIndex
 	// last entry
-	le := entries[len(entries) - 1]
+	le := entries[len(entries)-1]
 	// last index
 	li := le.Index
 	// first index
@@ -357,9 +357,9 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 		entries = entries[fi-entries[0].Index:]
 	}
 	//simply save all log entries at raft.Ready.Entries to raftdb
-	for _, entry := range entries{
+	for _, entry := range entries {
 		err := raftWB.SetMeta(meta.RaftLogKey(ps.region.Id, entry.Index), &entry)
-		if err != nil{
+		if err != nil {
 			return err
 		}
 	}
@@ -379,7 +379,7 @@ func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.Write
 // ApplySnapshot Apply the peer with given snapshot
 func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_util.WriteBatch, raftWB *engine_util.WriteBatch) (*ApplySnapResult, error) {
 	log.Infof("%v begin to apply snapshot", ps.Tag)
-	snapData := new(rspb.RaftSnapshotData)//new state
+	snapData := new(rspb.RaftSnapshotData) //new state
 	if err := snapData.Unmarshal(snapshot.Data); err != nil {
 		return nil, err
 	}
@@ -392,9 +392,9 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 	// and send RegionTaskApply task to region worker through ps.regionSched, also remember call ps.clearMeta
 	// and ps.clearExtraData to delete stale data
 	// Your Code Here (2C).
-	if !ps.isInitialized(){
+	if !ps.isInitialized() {
 		//delete stale data
-		if err := ps.clearMeta(kvWB,raftWB); err != nil{
+		if err := ps.clearMeta(kvWB, raftWB); err != nil {
 			return nil, err
 		}
 		//Delete all data that is not covered by `new_region`(snapData.Region)
@@ -413,20 +413,20 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 	kvWB.SetMeta(meta.ApplyStateKey(snapData.Region.GetId()), ps.applyState)
 
 	//send RegionTaskApply task to region worker through ps.regionSched
-	ch := make(chan <- bool)
-	regionTaskApply :=  runner.RegionTaskApply{
+	ch := make(chan<- bool)
+	regionTaskApply := runner.RegionTaskApply{
 		RegionId: snapData.Region.GetId(),
 		Notifier: ch,
 		SnapMeta: snapshot.Metadata,
 		StartKey: snapData.Region.GetStartKey(),
-		EndKey: snapData.Region.GetEndKey(),
+		EndKey:   snapData.Region.GetEndKey(),
 	}
 	ps.regionSched <- &regionTaskApply
-	meta.WriteRegionState(kvWB,snapData.Region, rspb.PeerState_Normal)
+	meta.WriteRegionState(kvWB, snapData.Region, rspb.PeerState_Normal)
 
 	return &ApplySnapResult{
 		PrevRegion: ps.region,
-		Region: snapData.Region,
+		Region:     snapData.Region,
 	}, nil
 }
 
@@ -451,11 +451,15 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	// Your Code Here (2B/2C).
 	// 2C is to be done later
 	raftWB := new(engine_util.WriteBatch)
+
+	//2C
 	var result *ApplySnapResult
+
 	var err error
-	if !raft.IsEmptySnap(&ready.Snapshot){
+	if !raft.IsEmptySnap(&ready.Snapshot) {
+		//2C
 		kvWB := new(engine_util.WriteBatch)
-		result, err = ps.ApplySnapshot(&ready.Snapshot, kvWB,raftWB)
+		result, err = ps.ApplySnapshot(&ready.Snapshot, kvWB, raftWB)
 		if err != nil {
 			return nil, err
 		}
@@ -463,7 +467,7 @@ func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, erro
 	}
 	// To append log entries, simply save all log entries at raft.Ready.Entries to raftdb
 	// and delete any previously appended log entries which will never be committed.
-	if err := ps.Append(ready.Entries, raftWB); err != nil{
+	if err := ps.Append(ready.Entries, raftWB); err != nil {
 		return nil, err
 	}
 

@@ -298,8 +298,8 @@ func (server *Server) KvCommit(_ context.Context, req *kvrpcpb.CommitRequest) (*
 	txn := mvcc.NewMvccTxn(sr, req.StartVersion)
 
 	//?????
-	//server.Latches.WaitForLatches(req.Keys)
-	//defer server.Latches.ReleaseLatches(req.Keys)
+	server.Latches.WaitForLatches(req.Keys)
+	defer server.Latches.ReleaseLatches(req.Keys)
 	for _, key := range req.Keys {
 		lock, err := txn.GetLock(key)
 		if err != nil {
@@ -488,8 +488,8 @@ func (server *Server) KvBatchRollback(_ context.Context, req *kvrpcpb.BatchRollb
 		return batchErr(err, resp)
 	}
 	txn := mvcc.NewMvccTxn(reader, req.StartVersion)
-	//server.Latches.WaitForLatches(req.Keys) ?????
-	//defer server.Latches.ReleaseLatches(req.Keys)
+	server.Latches.WaitForLatches(req.Keys) //?????
+	defer server.Latches.ReleaseLatches(req.Keys)
 	for _, key := range req.Keys {
 		write, _, err := txn.CurrentWrite(key)
 		if err != nil {
